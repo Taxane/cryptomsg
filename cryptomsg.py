@@ -17,54 +17,32 @@ charlist = list(string.printable)
 def otpgen(msglen=1024, participants='DD', numOfFiles=1):
 	for i in range(int(numOfFiles)):
 		namedFile = open('{}{}.txt'.format(participants, random.randint(1000, 999999)), 'w+')
-		for j in range(int(msglen)):
+		for j in range(int(msglen - 1)):
 			digitRep = int(random.uniform(0, len(charlist)))
 			namedFile.write(str(digitRep) + ' ')
 		namedFile.close()
 		#print(namedFile.read())
 
-def encrypt(plaintext=None, ciphertext='sendMe.txt', pad=None):
-	plainFile      = open(plaintext, 'r')
-	plainFileList  = list(str(plainFile.read()))
-	cipherFile     = open(ciphertext, 'w+')
-	cipherFileList = list(str(cipherFile.read()))
-	padFile        = open(pad, 'r')
-	padFileList    = str(padFile.read()).split(' ')
-	counter        = 0
-	charsToFile    = 0
-	for character in plainFileList:
-		for index in range(len(charlist)):
-			if character == charlist[index]:
-				#print(padFileList[counter])
-				cipherFile.write(str((int(padFileList[counter]) + index) % len(charlist)) + ' ')
-				charsToFile += 1
-			else:
-				continue
+def encrypt(plaintext=None, pad=None, ciphertext='sendMe.txt'):
+	with open(plaintext , 'r+') as plainFile:
+		plainFileText = plainFile.read()
+	listedPlain = list(plainFileText)
+	with open(pad, 'r+') as padFile:
+		padFileText = padFile.read()
+	listedPad = padFileText.split(' ')
+	#print(len(listedPad), len(listedPlain))
+	cipherFile = open(ciphertext, 'w+')
+	counter = 0
+	for character in range(len(listedPlain)):
+		indexedChar = charlist.index(listedPlain[character])
+		toWrite = str(indexedChar + int(listedPad[character]))
+		cipherFile.write(toWrite + ' ')
 		counter += 1
-	
-#	print(charsToFile)
-	print(len(padFileList) - charsToFile)		
-	for filler in range(len(padFileList) - charsToFile):
-		cipherFile.write(str(int(random.uniform(0, len(charlist)))) + ' ')
-	
+	for paddingcount in range(len(listedPad) - counter):
+		cipherFile.write(str(int(random.uniform(0, 2 * len(charlist)))) + ' ')
 	cipherFile.close()
-	
-	cipherFile2    = open(ciphertext, 'r')
-	cipherFileList2= list(str(cipherFile2.read()))
-		
-	for i in range(len(padFileList)):
-		print((list(str(cipherFile.read()))[i + 1] + padFileList[i]) % len(charlist))
-#		print(len(padFileList))
-#		print(len(cipherFileList2))
-		pass
 
-	plainFile.close()
-	cipherFile.close()
-	padFile.close()
-				
-	
 
 if __name__ == '__main__':
+	encrypt(plaintext='test.txt', pad='DD604063.txt')
 	#otpgen()
-	encrypt(plaintext='test.txt', pad='DD531938.txt')
-	#print(charlist)
